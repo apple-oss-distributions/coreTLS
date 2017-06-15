@@ -131,6 +131,42 @@ typedef enum {
     tls_handshake_trust_cert_invalid = 4,
 } tls_handshake_trust_t;
 
+/* alert message levels */
+typedef enum {
+    tls_handshake_alert_level_warning = 1,
+    tls_handshake_alert_level_fatal = 2,
+} tls_alert_level_t;
+
+/* alert message descriptions */
+typedef enum {
+    tls_handshake_alert_CloseNotify = 0,
+    tls_handshake_alert_UnexpectedMsg = 10,
+    tls_handshake_alert_BadRecordMac = 20,
+    tls_handshake_alert_DecryptionFail_RESERVED = 21,  /* TLS */
+    tls_handshake_alert_RecordOverflow = 22,           /* TLS */
+    tls_handshake_alert_DecompressFail = 30,
+    tls_handshake_alert_HandshakeFail = 40,
+    tls_handshake_alert_NoCert_RESERVED = 41,
+    tls_handshake_alert_BadCert = 42,                  /* SSLv3 only */
+    tls_handshake_alert_UnsupportedCert = 43,
+    tls_handshake_alert_CertRevoked = 44,
+    tls_handshake_alert_CertExpired = 45,
+    tls_handshake_alert_CertUnknown = 46,
+    tls_handshake_alert_IllegalParam = 47,
+    tls_handshake_alert_UnknownCA = 48,
+    tls_handshake_alert_AccessDenied = 49,
+    tls_handshake_alert_DecodeError = 50,
+    tls_handshake_alert_DecryptError = 51,
+    tls_handshake_alert_ExportRestriction_RESERVED = 60,
+    tls_handshake_alert_ProtocolVersion = 70,
+    tls_handshake_alert_InsufficientSecurity = 71,
+    tls_handshake_alert_InternalError = 80,
+    tls_handshake_alert_InappropriateFallback = 86,    /* RFC 7507 */
+    tls_handshake_alert_UserCancelled = 90,
+    tls_handshake_alert_NoRenegotiation = 100,
+    tls_handshake_alert_UnsupportedExtension = 110,    /* TLS 1.2 */
+} tls_alert_t;
+
 /* common configurations */
 typedef enum {
     /* No configuration - returned when custom ciphers or versions are set. */
@@ -139,7 +175,7 @@ typedef enum {
     tls_handshake_config_default = 0,
     /* TLS v1.2 to SSLv3, with default + RC4 ciphersuites ciphersuites */
     tls_handshake_config_legacy = 1,
-    /* TLS v1.2 to TLS v1.0, with default ciphersuites (no RC4) */
+    /* TLS v1.2 to TLS v1.0, with default ciphersuites (no 3DES) */
     tls_handshake_config_standard = 2,
     /* TLS v1.2 to TLS v1.0, with defaults ciphersuites + RC4 */
     tls_handshake_config_RC4_fallback = 3,
@@ -155,7 +191,14 @@ typedef enum {
     tls_handshake_config_legacy_DHE = 8,
     /* TLS v1.2 only, anonymous ciphersuites only, no RC4 or 3DES */
     tls_handshake_config_anonymous = 9,
-
+    /* TLS v1.2 to TLS v1.0, with defaults ciphersuites + 3DES */
+    tls_handshake_config_3DES_fallback = 10,
+    /* TLS v1.0, with defaults ciphersuites + 3DES */
+    tls_handshake_config_TLSv1_3DES_fallback = 11,
+    /* TLS v1.3 to TLS v1.0, with default ciphersuites (no 3DES) */
+    tls_handshake_config_standard_TLSv3 = 12,
+    /* TLS v1.3, and TLS v1.2 with only PFS ciphersuites */
+    tls_handshake_config_ATSv2 = 13,
 } tls_handshake_config_t;
 
 
@@ -274,6 +317,10 @@ tls_handshake_close(tls_handshake_t filter);
 /* Retransmit timer expired - DTLS only */
 int
 tls_handshake_retransmit_timer_expired(tls_handshake_t filter);
+
+/* Send a TLS alert message */
+int
+tls_handshake_send_alert(tls_handshake_t filter, tls_alert_level_t level, tls_alert_t description);
 
 /* Set/Get options and parameters : */
 /*==============================*/
